@@ -364,7 +364,7 @@ publishBtn.addEventListener(
 
                 response =
                     await fetch(
-                        `http://localhost:5000/api/photos/${editingPhotoId}`,
+                        `https://patient-creativity-production-c87f.up.railway.app/api/photos/${editingPhotoId}`,
                         {
                             method: "PUT",
 
@@ -388,7 +388,7 @@ publishBtn.addEventListener(
 
                 response =
                     await fetch(
-                        "http://localhost:5000/api/photos",
+                        "https://patient-creativity-production-c87f.up.railway.app/api/photos",
                         {
                             method: "POST",
 
@@ -483,7 +483,7 @@ async function loadPhotos() {
 
         const response =
             await fetch(
-                "http://localhost:5000/api/photos"
+                "https://patient-creativity-production-c87f.up.railway.app/api/photos"
             );
 
 
@@ -844,7 +844,7 @@ async function deletePhoto(id) {
 
         const response =
             await fetch(
-                `http://localhost:5000/api/photos/${id}`,
+                `https://patient-creativity-production-c87f.up.railway.app/api/photos/${id}`,
                 {
                     method: "DELETE"
                 }
@@ -970,7 +970,7 @@ async function loadPurchases() {
     try {
 
         const response = await fetch(
-            "http://localhost:5000/api/purchases"
+            "https://patient-creativity-production-c87f.up.railway.app/api/purchases"
         );
 
 
@@ -1120,7 +1120,7 @@ async function loadDashboardStats() {
     try {
 
         const response = await fetch(
-            "http://localhost:5000/api/stats"
+            "https://patient-creativity-production-c87f.up.railway.app/api/stats"
         );
 
         if (!response.ok) {
