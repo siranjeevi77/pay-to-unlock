@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Pay to Unlock</title>
+
+
+    <!-- Razorpay Checkout -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef2ff,
+                    #f8fafc
+                );
+
+            min-height: 100vh;
+
+            padding: 40px 20px;
+
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .page-header {
+
+            text-align: center;
+
+            margin-bottom: 40px;
+
+        }
+
+
+        .page-header h1 {
+
+            margin: 0 0 10px;
+
+            font-size: 36px;
+
+            color: #111827;
+
+        }
+
+
+        .page-header p {
+
+            margin: 0;
+
+            color: #64748b;
+
+            font-size: 16px;
+
+        }
+
+
+        /* =========================
+           PHOTO LIST
+        ========================= */
+
+        #photoList {
+
+            width: 100%;
+
+            max-width: 750px;
+
+            margin: auto;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 30px;
+
+        }
+
+
+        /* =========================
+           PHOTO CARD
+        ========================= */
+
+        .photo-card {
+
+            background: white;
+
+            border-radius: 22px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 15px 40px
+                rgba(0, 0, 0, 0.08);
+
+        }
+
+
+        /* =========================
+           IMAGE AREA
+        ========================= */
+
+        .photo-container {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 450px;
+
+            background: #f1f5f9;
+
+            overflow: hidden;
+
+        }
+
+
+        .photo-image {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+
+            display: block;
+
+            background: #f1f5f9;
+
+            transition:
+                filter 0.5s ease,
+                transform 0.5s ease;
+
+        }
+
+
+        /* LOCKED IMAGE */
+
+        .photo-image.locked {
+
+            filter: blur(18px);
+
+            transform: scale(1.08);
+
+        }
+
+
+        /* UNLOCKED IMAGE */
+
+        .photo-image.unlocked {
+
+            filter: none;
+
+            transform: none;
+
+        }
+
+
+        /* =========================
+           LOCK OVERLAY
+        ========================= */
+
+        .lock-overlay {
+
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            flex-direction: column;
+
+            background:
+                rgba(0, 0, 0, 0.30);
+
+            color: white;
+
+            text-align: center;
+
+        }
+
+
+        .lock-icon {
+
+            font-size: 55px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .lock-overlay h2 {
+
+            margin: 5px;
+
+            font-size: 24px;
+
+        }
+
+
+        .lock-overlay p {
+
+            margin: 5px;
+
+            font-size: 14px;
+
+        }
+
+
+        /* =========================
+           PHOTO INFORMATION
+        ========================= */
+
+        .photo-info {
+
+            padding: 25px;
+
+        }
+
+
+        .photo-title {
+
+            margin: 0 0 8px;
+
+            font-size: 24px;
+
+            color: #111827;
+
+        }
+
+
+        .photo-description {
+
+            margin: 0 0 20px;
+
+            color: #64748b;
+
+            line-height: 1.6;
+
+        }
+
+
+        /* =========================
+           BOTTOM SECTION
+        ========================= */
+
+        .photo-bottom {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+        }
+
+
+        .photo-price {
+
+            font-size: 26px;
+
+            font-weight: bold;
+
+            color: #4f46e5;
+
+        }
+
+
+        /* =========================
+           UNLOCK BUTTON
+        ========================= */
+
+        .unlock-button {
+
+            border: none;
+
+            background: #4f46e5;
+
+            color: white;
+
+            padding: 14px 22px;
+
+            border-radius: 11px;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+
+        }
+
+
+        .unlock-button:hover {
+
+            background: #4338ca;
+
+            transform: translateY(-1px);
+
+        }
+
+
+        .unlock-button:disabled {
+
+            opacity: 0.7;
+
+            cursor: not-allowed;
+
+            transform: none;
+
+        }
+
+
+        /* =========================
+           LOADING / EMPTY
+        ========================= */
+
+        .empty-message {
+
+            text-align: center;
+
+            background: white;
+
+            border-radius: 20px;
+
+            padding: 60px 20px;
+
+            color: #64748b;
+
+            box-shadow:
+                0 10px 30px
+                rgba(0, 0, 0, 0.05);
+
+        }
+
+
+        .empty-message .icon {
+
+            font-size: 50px;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .empty-message h2 {
+
+            color: #334155;
+
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            body {
+
+                padding: 25px 12px;
+
+            }
+
+
+            .page-header h1 {
+
+                font-size: 28px;
+
+            }
+
+
+            .photo-container {
+
+                height: 350px;
+
+            }
+
+
+            .photo-bottom {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+            }
+
+
+            .photo-price {
+
+                text-align: center;
+
+            }
+
+
+            .unlock-button {
+
+                width: 100%;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header class="page-header">
+
+        <h1>
+            🔐 Premium Photos
+        </h1>
+
+        <p>
+            Unlock your favorite photos
+        </p>
+
+    </header>
+
+
+    <!-- =========================
+         PHOTO LIST
+    ========================= -->
+
+    <div id="photoList">
+
+        <div class="empty-message">
+
+            <div class="icon">
+                ⏳
+            </div>
+
+            <h2>
+                Loading photos...
+            </h2>
+
+            <p>
+                Please wait.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        // ==================================================
+        // LOAD PHOTOS
+        // ==================================================
+
+        async function loadPhotos() {
+
+            const photoList =
+                document.getElementById(
+                    "photoList"
+                );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "http://localhost:5000/api/photos"
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Could not connect to server."
+                    );
+
+                }
+
+
+                const photos =
+                    await response.json();
+
+
+                // Only show published photos
+
+                const publishedPhotos =
+                    photos.filter(
+                        photo =>
+                            photo.status === "published"
+                    );
+
+
+                // No photos
+
+                if (
+                    publishedPhotos.length === 0
+                ) {
+
+                    photoList.innerHTML = `
+
+                        <div class="empty-message">
+
+                            <div class="icon">
+                                📷
+                            </div>
+
+                            <h2>
+                                No photos available
+                            </h2>
+
+                            <p>
+                                Please check again later.
+                            </p>
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                // Clear loading message
+
+                photoList.innerHTML = "";
+
+
+                // Create one card for every photo
+
+                publishedPhotos.forEach(
+                    function(photo) {
+
+                        createPhotoCard(
+                            photo,
+                            photoList
+                        );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                photoList.innerHTML = `
+
+                    <div class="empty-message">
+
+                        <div class="icon">
+                            ⚠️
+                        </div>
+
+                        <h2>
+                            Unable to load photos
+                        </h2>
+
+                        <p>
+                            Please make sure the
+                            backend server is running.
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+
+
+
+        // ==================================================
+        // CREATE PHOTO CARD
+        // ==================================================
+
+        function createPhotoCard(
+            photo,
+            container
+        ) {
+
+
+            // CARD
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "photo-card";
+
+
+            // IMAGE CONTAINER
+
+            const imageContainer =
+                document.createElement(
+                    "div"
+                );
+
+            imageContainer.className =
+                "photo-container";
+
+
+            // IMAGE
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.className =
+                "photo-image locked";
+
+            image.src =
+                photo.image;
+
+            image.alt =
+                photo.title;
+
+
+            // LOCK OVERLAY
+
+            const overlay =
+                document.createElement(
+                    "div"
+                );
+
+            overlay.className =
+                "lock-overlay";
+
+
+            overlay.innerHTML = `
+
+                <div class="lock-icon">
+                    🔒
+                </div>
+
+                <h2>
+                    Photo Locked
+                </h2>
+
+                <p>
+                    Unlock to view the
+                    original photo
+                </p>
+
+            `;
+
+
+            imageContainer.appendChild(
+                image
+            );
+
+            imageContainer.appendChild(
+                overlay
+            );
+
+
+
+            // =========================
+            // PHOTO INFO
+            // =========================
+
+            const info =
+                document.createElement(
+                    "div"
+                );
+
+            info.className =
+                "photo-info";
+
+
+            // TITLE
+
+            const title =
+                document.createElement(
+                    "h2"
+                );
+
+            title.className =
+                "photo-title";
+
+            title.textContent =
+                photo.title;
+
+
+            // DESCRIPTION
+
+            const description =
+                document.createElement(
+                    "p"
+                );
+
+            description.className =
+                "photo-description";
+
+            description.textContent =
+                photo.description ||
+                "Premium photo";
+
+
+            // BOTTOM
+
+            const bottom =
+                document.createElement(
+                    "div"
+                );
+
+            bottom.className =
+                "photo-bottom";
+
+
+            // PRICE
+
+            const price =
+                document.createElement(
+                    "div"
+                );
+
+            price.className =
+                "photo-price";
+
+            price.textContent =
+                `₹${photo.price}`;
+
+
+            // BUTTON
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "unlock-button";
+
+            button.textContent =
+                `🔓 Unlock for ₹${photo.price}`;
+
+
+            // =========================
+            // PAYMENT BUTTON
+            // =========================
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    startPayment(
+                        photo,
+                        image,
+                        overlay,
+                        button
+                    );
+
+                }
+            );
+
+
+            // BUILD INFO
+
+            bottom.appendChild(
+                price
+            );
+
+            bottom.appendChild(
+                button
+            );
+
+
+            info.appendChild(
+                title
+            );
+
+            info.appendChild(
+                description
+            );
+
+            info.appendChild(
+                bottom
+            );
+
+
+            // BUILD CARD
+
+            card.appendChild(
+                imageContainer
+            );
+
+            card.appendChild(
+                info
+            );
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+
+
+
+        // ==================================================
+        // START RAZORPAY PAYMENT
+        // ==================================================
+
+        async function startPayment(
+            photo,
+            image,
+            overlay,
+            button
+        ) {
+
+
+            try {
+
+                // Disable button
+
+                button.disabled = true;
+
+                button.textContent =
+                    "Creating payment...";
+
+
+                // =========================
+                // CREATE ORDER
+                // =========================
+
+                const orderResponse =
+                    await fetch(
+                        "http://localhost:5000/api/create-order",
+                        {
+
+                            method: "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    photoId:
+                                        photo.id
+
+                                })
+
+                        }
+                    );
+
+
+                const orderData =
+                    await orderResponse.json();
+
+
+                if (!orderResponse.ok) {
+
+                    throw new Error(
+                        orderData.message ||
+                        "Could not create payment."
+                    );
+
+                }
+
+
+                console.log(
+                    "Razorpay Order:",
+                    orderData
+                );
+
+
+                // =========================
+                // RAZORPAY OPTIONS
+                // =========================
+
+                const options = {
+
+                    key:
+                        orderData.keyId,
+
+                    amount:
+                        orderData.amount,
+
+                    currency:
+                        orderData.currency,
+
+                    name:
+                        "Pay-to-Unlock",
+
+                    description:
+                        photo.title,
+
+                    order_id:
+                        orderData.orderId,
+
+
+                    // =========================
+                    // PAYMENT SUCCESS
+                    // =========================
+
+                    handler:
+                        async function(response) {
+
+
+                            try {
+
+                                button.textContent =
+                                    "Verifying payment...";
+
+
+                                // =========================
+                                // VERIFY PAYMENT
+                                // =========================
+
+                                const verifyResponse =
+                                    await fetch(
+                                        "http://localhost:5000/api/verify-payment",
+                                        {
+
+                                            method:
+                                                "POST",
+
+                                            headers: {
+
+                                                "Content-Type":
+                                                    "application/json"
+
+                                            },
+
+                                            body:
+                                                JSON.stringify({
+
+                                                    razorpay_order_id:
+                                                        response
+                                                            .razorpay_order_id,
+
+                                                    razorpay_payment_id:
+                                                        response
+                                                            .razorpay_payment_id,
+
+                                                    razorpay_signature:
+                                                        response
+                                                            .razorpay_signature,
+
+                                                    photoId:
+                                                        photo.id
+
+                                                })
+
+                                        }
+                                    );
+
+
+                                const verifyData =
+                                    await verifyResponse.json();
+
+
+                                if (
+                                    !verifyResponse.ok
+                                ) {
+
+                                    throw new Error(
+                                        verifyData.message ||
+                                        "Payment verification failed."
+                                    );
+
+                                }
+
+
+                                // =========================
+                                // UNLOCK PHOTO
+                                // =========================
+
+                                image.classList.remove(
+                                    "locked"
+                                );
+
+
+                                image.classList.add(
+                                    "unlocked"
+                                );
+
+
+                                overlay.style.display =
+                                    "none";
+
+
+                                button.textContent =
+                                    "✓ Unlocked";
+
+
+                                button.disabled =
+                                    true;
+
+
+                                alert(
+                                    "Payment successful! 🎉\n\nPhoto unlocked."
+                                );
+
+
+                            } catch (error) {
+
+                                console.error(
+                                    error
+                                );
+
+
+                                button.disabled =
+                                    false;
+
+
+                                button.textContent =
+                                    `🔓 Unlock for ₹${photo.price}`;
+
+
+                                alert(
+                                    "Payment verification failed.\n\n" +
+                                    error.message
+                                );
+
+                            }
+
+                        },
+
+
+                    // =========================
+                    // CHECKOUT CLOSED
+                    // =========================
+
+                    modal: {
+
+                        ondismiss:
+                            function() {
+
+                                button.disabled =
+                                    false;
+
+                                button.textContent =
+                                    `🔓 Unlock for ₹${photo.price}`;
+
+                            }
+
+                    }
+
+                };
+
+
+                // =========================
+                // OPEN RAZORPAY
+                // =========================
+
+                const razorpay =
+                    new Razorpay(
+                        options
+                    );
+
+
+                razorpay.open();
+
+
+            } catch (error) {
+
+                console.error(
+                    error
+                );
+
+
+                button.disabled =
+                    false;
+
+
+                button.textContent =
+                    `🔓 Unlock for ₹${photo.price}`;
+
+
+                alert(
+                    "Could not start payment.\n\n" +
+                    error.message
+                );
+
+            }
+
+        }
+
+
+
+        // ==================================================
+        // START
+        // ==================================================
+
+        loadPhotos();
+
+    </script>
+
+</body>
+
+</html>

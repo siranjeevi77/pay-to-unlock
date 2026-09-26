@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Pay-to-Unlock Admin</title>
+
+    <link
+        rel="stylesheet"
+        href="admin.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+        🔐 PayUnlock
+    </div>
+
+    <nav>
+
+        <a href="#" class="active">
+            📊 Dashboard
+        </a>
+
+        <a href="#upload">
+            📷 Upload Photo
+        </a>
+
+        <a href="#gallery">
+            🖼️ Photos
+        </a>
+
+    </nav>
+
+</aside>
+
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main">
+
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div>
+
+            <h1>
+                Admin Dashboard
+            </h1>
+
+            <p>
+                Manage your locked photos
+            </p>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         STATS
+    ========================= -->
+
+    <section class="stats">
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📷
+            </div>
+
+            <div>
+
+                <span>
+                    Total Photos
+                </span>
+
+                <strong id="photoCount">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🔒
+            </div>
+
+            <div>
+
+                <span>
+                    Status
+                </span>
+
+                <strong>
+                    Active
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                💰
+            </div>
+
+            <div>
+
+                <span>
+                    Payment
+                </span>
+
+                <strong>
+                    ₹ INR
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         UPLOAD
+    ========================= -->
+
+    <section
+        class="panel"
+        id="upload"
+    >
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    Upload New Photo
+                </h2>
+
+                <p>
+                    Add a photo and set the unlock price.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="upload-layout">
+
+
+            <!-- IMAGE -->
+
+            <div class="image-section">
+
+                <label class="section-label">
+                    Photo
+                </label>
+
+
+                <div
+                    class="upload-box"
+                    id="uploadBox"
+                >
+
+                    <div
+                        id="uploadContent"
+                        class="upload-content"
+                    >
+
+                        <div class="upload-icon">
+                            📷
+                        </div>
+
+                        <h3>
+                            Add Image
+                        </h3>
+
+                        <p>
+                            Click here to select a photo
+                        </p>
+
+                        <small>
+                            JPG, PNG, WEBP
+                        </small>
+
+                    </div>
+
+
+                    <img
+                        id="previewImage"
+                        src=""
+                        alt="Selected image"
+                    >
+
+
+                    <input
+                        type="file"
+                        id="photoInput"
+                        accept="image/*"
+                    >
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="change-image-btn"
+                    id="changeImageBtn"
+                >
+                    Choose Another Image
+                </button>
+
+            </div>
+
+
+
+            <!-- FORM -->
+
+            <div class="form-section">
+
+
+                <div class="form-group">
+
+                    <label for="photoTitle">
+                        Photo Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="photoTitle"
+                        placeholder="Enter photo title"
+                    >
+
+                </div>
+
+
+
+                <div class="form-row">
+
+
+                    <div class="form-group">
+
+                        <label for="photoPrice">
+                            Unlock Price
+                        </label>
+
+                        <div class="price-input">
+
+                            <span>
+                                ₹
+                            </span>
+
+                            <input
+                                type="number"
+                                id="photoPrice"
+                                placeholder="49"
+                                min="1"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="photoStatus">
+                            Status
+                        </label>
+
+                        <select id="photoStatus">
+
+                            <option value="published">
+                                Published
+                            </option>
+
+                            <option value="draft">
+                                Draft
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="photoDescription">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="photoDescription"
+                        rows="5"
+                        placeholder="Write a description..."
+                    ></textarea>
+
+                </div>
+
+
+
+                <div class="button-row">
+
+                    <button
+                        type="button"
+                        class="reset-btn"
+                        id="resetBtn"
+                    >
+                        Reset
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="publish-btn"
+                        id="publishBtn"
+                    >
+                        Publish Photo
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         GALLERY
+    ========================= -->
+
+    <section
+        class="panel"
+        id="gallery"
+    >
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    Your Photos
+                </h2>
+
+                <p>
+                    Photos available for customers.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="photoGallery"
+            class="photo-gallery"
+        >
+
+            <div
+                id="emptyMessage"
+                class="empty-message"
+            >
+
+                <div>
+                    🖼️
+                </div>
+
+                <h3>
+                    No photos yet
+                </h3>
+
+                <p>
+                    Upload your first photo above.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+    <!-- =========================
+     PURCHASES SECTION
+========================= -->
+
+<section class="purchases-section">
+
+    <div class="section-header">
+
+        <div>
+            <h2>Purchases</h2>
+            <p>View successful photo purchases</p>
+        </div>
+
+        <button
+            class="refresh-btn"
+            onclick="loadPurchases()"
+        >
+            🔄 Refresh
+        </button>
+
+    </div>
+
+
+    <div class="purchase-table-wrapper">
+
+        <table class="purchase-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Photo</th>
+
+                    <th>Amount</th>
+
+                    <th>Payment ID</th>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="purchaseTableBody">
+
+                <tr>
+
+                    <td colspan="5">
+
+                        No purchases yet.
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<script src="admin.js"></script>
+
+</body>
+
+</html>
