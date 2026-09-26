@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
@@ -21,6 +22,8 @@ app.use(
         limit: "15mb"
     })
 );
+app.use("/admin", express.static(path.join(__dirname, "../admin")));
+app.use("/customer", express.static(path.join(__dirname, "../admin/customer")));
 
 
 // =====================================================
