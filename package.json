@@ -11,9 +11,12 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "better-sqlite3": "^13.0.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
-    "razorpay": "^2.9.8"
+    "multer": "^2.4.0",
+    "razorpay": "^2.9.8",
+    "sharp": "^0.35.4"
   }
 }

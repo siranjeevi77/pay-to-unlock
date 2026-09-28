@@ -10,16 +10,35 @@ app.use(cors());
 app.use(express.json({ limit: "15mb" }));
 
 
-// ============================
-// TEST ROUTE
-// ============================
+// --------------------------------------------------
+// FRONTEND
+// --------------------------------------------------
 
+// Serve admin panel
+app.use(
+    "/admin",
+    express.static(path.join(__dirname, "../admin"))
+);
+
+// Serve customer website
+app.use(
+    "/customer",
+    express.static(path.join(__dirname, "../admin/customer"))
+);
+
+// --------------------------------------------------
+// HOME
+// --------------------------------------------------
+
+// Open customer website at the Railway root URL
 app.get("/", (req, res) => {
-    res.json({
-        message: "Pay-to-Unlock backend is running! 🚀"
-    });
+    res.sendFile(
+        path.join(
+            __dirname,
+            "../admin/customer/index.html"
+        )
+    );
 });
-
 
 // ============================
 // PHOTO API

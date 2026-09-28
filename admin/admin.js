@@ -1,481 +1,512 @@
-// ============================
-// ELEMENTS
-// ============================
+// ============================================================
+// PAY-TO-UNLOCK ADMIN PANEL
+// ============================================================
 
-const photoInput =
-    document.getElementById("photoInput");
+// Local Node.js backend
+const API_BASE = "http://localhost:5000";
 
-const uploadBox =
-    document.getElementById("uploadBox");
+// ============================================================
+// DOM ELEMENTS
+// ============================================================
 
-const uploadContent =
-    document.getElementById("uploadContent");
+const photoInput = document.getElementById("photoInput");
+const previewImage = document.getElementById("previewImage");
+const uploadContent = document.getElementById("uploadContent");
 
-const previewImage =
-    document.getElementById("previewImage");
+const photoTitle = document.getElementById("photoTitle");
+const photoPrice = document.getElementById("photoPrice");
+const photoStatus = document.getElementById("photoStatus");
+const photoDescription = document.getElementById("photoDescription");
 
-const changeImageBtn =
-    document.getElementById("changeImageBtn");
+const publishBtn = document.getElementById("publishBtn");
+const resetBtn = document.getElementById("resetBtn");
+const changeImageBtn = document.getElementById("changeImageBtn");
 
-const photoTitle =
-    document.getElementById("photoTitle");
+const photoGallery = document.getElementById("photoGallery");
+const photoCount = document.getElementById("photoCount");
 
-const photoPrice =
-    document.getElementById("photoPrice");
+const purchaseTableBody =
+    document.getElementById("purchaseTableBody");
 
-const photoDescription =
-    document.getElementById("photoDescription");
+const totalPhotos =
+    document.getElementById("totalPhotos");
 
-const photoStatus =
-    document.getElementById("photoStatus");
+const totalPurchases =
+    document.getElementById("totalPurchases");
 
-const publishBtn =
-    document.getElementById("publishBtn");
+const totalRevenue =
+    document.getElementById("totalRevenue");
 
-const resetBtn =
-    document.getElementById("resetBtn");
+// ============================================================
+// STATE
+// ============================================================
 
-const photoGallery =
-    document.getElementById("photoGallery");
-
-const emptyMessage =
-    document.getElementById("emptyMessage");
-
-const photoCount =
-    document.getElementById("photoCount");
-
-
-// ============================
-// VARIABLES
-// ============================
-
-let selectedImageData = null;
-
+let selectedFile = null;
+let editingPhotoId = null;
 let photos = [];
 
-let editingPhotoId = null;
+// ============================================================
+// HELPER
+// ============================================================
 
+function getImageData(photo) {
 
-// ============================
-// OPEN FILE PICKER
-// ============================
+    if (!photo || !photo.image) {
+        return {
+            preview: "",
+            original: ""
+        };
+    }
 
-uploadBox.addEventListener(
-    "click",
-    function (event) {
+    // New backend format
+    try {
 
-        if (
-            event.target === photoInput
-        ) {
-            return;
+        const parsed = JSON.parse(photo.image);
+
+        if (parsed && typeof parsed === "object") {
+            return parsed;
         }
 
-        photoInput.click();
-
+    } catch (error) {
+        // Old database format
     }
-);
+
+    // Old image format
+    return {
+        preview: photo.image,
+        original: photo.image
+    };
+}
 
 
-// ============================
-// CHOOSE IMAGE
-// ============================
+// ============================================================
+// IMAGE FILE SELECTION
+// ============================================================
 
-photoInput.addEventListener(
-    "change",
-    function () {
+if (photoInput) {
 
-        const file =
-            this.files[0];
+    photoInput.addEventListener("change", function () {
+
+        const file = this.files[0];
 
         if (!file) {
             return;
         }
 
+        if (!file.type.startsWith("image/")) {
 
-        if (
-            !file.type.startsWith("image/")
-        ) {
+            alert("Please select a valid image.");
 
-            alert(
-                "Please select an image file."
-            );
+            this.value = "";
 
             return;
         }
 
+        selectedFile = file;
 
-        compressImage(file);
+        const reader = new FileReader();
 
-    }
-);
+        reader.onload = function (event) {
 
+            if (previewImage) {
 
-// ============================
-// COMPRESS IMAGE
-// ============================
+                previewImage.src =
+                    event.target.result;
 
-function compressImage(file) {
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload = function (event) {
-
-        const img =
-            new Image();
-
-
-        img.onload = function () {
-
-            const canvas =
-                document.createElement(
-                    "canvas"
-                );
-
-
-            const maxWidth = 1200;
-
-            const maxHeight = 1200;
-
-
-            let width =
-                img.width;
-
-            let height =
-                img.height;
-
-
-            if (
-                width > maxWidth ||
-                height > maxHeight
-            ) {
-
-                const ratio =
-                    Math.min(
-                        maxWidth / width,
-                        maxHeight / height
-                    );
-
-
-                width =
-                    Math.round(
-                        width * ratio
-                    );
-
-                height =
-                    Math.round(
-                        height * ratio
-                    );
-
+                previewImage.style.display =
+                    "block";
             }
 
+            if (uploadContent) {
 
-            canvas.width = width;
-
-            canvas.height = height;
-
-
-            const context =
-                canvas.getContext(
-                    "2d"
-                );
-
-
-            context.drawImage(
-                img,
-                0,
-                0,
-                width,
-                height
-            );
-
-
-            selectedImageData =
-                canvas.toDataURL(
-                    "image/jpeg",
-                    0.75
-                );
-
-
-            // SHOW PREVIEW
-
-            previewImage.src =
-                selectedImageData;
-
-
-            previewImage.style.display =
-                "block";
-
-
-            // HIDE "ADD IMAGE"
-
-            uploadContent.style.display =
-                "none";
-
-
-            // SHOW CHANGE BUTTON
-
-            changeImageBtn.style.display =
-                "block";
-
+                uploadContent.style.display =
+                    "none";
+            }
         };
 
+        reader.readAsDataURL(file);
 
-        img.onerror = function () {
-
-            alert(
-                "Could not load this image."
-            );
-
-        };
-
-
-        img.src =
-            event.target.result;
-
-    };
-
-
-    reader.onerror = function () {
-
-        alert(
-            "Could not read the image."
-        );
-
-    };
-
-
-    reader.readAsDataURL(file);
-
+    });
 }
 
 
-// ============================
-// CHANGE IMAGE
-// ============================
+// ============================================================
+// CHANGE IMAGE BUTTON
+// ============================================================
 
-changeImageBtn.addEventListener(
-    "click",
-    function () {
+if (changeImageBtn) {
 
-        photoInput.click();
+    changeImageBtn.addEventListener(
+        "click",
+        function () {
 
-    }
-);
-
-
-// ============================
-// PUBLISH / UPDATE
-// ============================
-
-publishBtn.addEventListener(
-    "click",
-    async function () {
-
-        const title =
-            photoTitle.value.trim();
-
-
-        const price =
-            Number(
-                photoPrice.value
-            );
-
-
-        const description =
-            photoDescription.value.trim();
-
-
-        const status =
-            photoStatus.value;
-
-
-        // VALIDATION
-
-        if (!selectedImageData) {
-
-            alert(
-                "Please select a photo."
-            );
-
-            return;
-        }
-
-
-        if (!title) {
-
-            alert(
-                "Please enter a photo title."
-            );
-
-            return;
-        }
-
-
-        if (
-            !price ||
-            price <= 0
-        ) {
-
-            alert(
-                "Please enter a valid price."
-            );
-
-            return;
-        }
-
-
-        // BUTTON LOADING
-
-        publishBtn.disabled =
-            true;
-
-
-        publishBtn.textContent =
-            editingPhotoId
-                ? "Updating..."
-                : "Publishing...";
-
-
-        try {
-
-            const photoData = {
-
-                title: title,
-
-                price: price,
-
-                description: description,
-
-                status: status,
-
-                image: selectedImageData
-
-            };
-
-
-            let response;
-
-
-            // UPDATE
-
-            if (editingPhotoId) {
-
-                response =
-                    await fetch(
-                        `https://patient-creativity-production-c87f.up.railway.app/api/photos/${editingPhotoId}`,
-                        {
-                            method: "PUT",
-
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body:
-                                JSON.stringify(
-                                    photoData
-                                )
-                        }
-                    );
-
+            if (photoInput) {
+                photoInput.click();
             }
 
-            // CREATE
+        }
+    );
+}
 
-            else {
 
-                response =
-                    await fetch(
-                        "https://patient-creativity-production-c87f.up.railway.app/api/photos",
-                        {
-                            method: "POST",
+// ============================================================
+// DRAG & DROP
+// ============================================================
 
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
+const uploadArea =
+    document.querySelector(".upload-area");
 
-                            body:
-                                JSON.stringify(
-                                    photoData
-                                )
-                        }
-                    );
+if (uploadArea) {
 
+    uploadArea.addEventListener(
+        "dragover",
+        function (event) {
+
+            event.preventDefault();
+
+            uploadArea.classList.add(
+                "drag-over"
+            );
+
+        }
+    );
+
+
+    uploadArea.addEventListener(
+        "dragleave",
+        function () {
+
+            uploadArea.classList.remove(
+                "drag-over"
+            );
+
+        }
+    );
+
+
+    uploadArea.addEventListener(
+        "drop",
+        function (event) {
+
+            event.preventDefault();
+
+            uploadArea.classList.remove(
+                "drag-over"
+            );
+
+            const file =
+                event.dataTransfer.files[0];
+
+            if (!file) {
+                return;
             }
 
+            if (!file.type.startsWith("image/")) {
 
-            const data =
-                await response.json();
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    data.message ||
-                    "Something went wrong."
+                alert(
+                    "Please drop a valid image."
                 );
 
+                return;
             }
 
+            selectedFile = file;
 
-            alert(
-                editingPhotoId
-                    ? "Photo updated successfully! ✅"
-                    : "Photo published successfully! 🎉"
-            );
+            const dataTransfer =
+                new DataTransfer();
 
+            dataTransfer.items.add(file);
 
-            editingPhotoId =
-                null;
+            if (photoInput) {
+                photoInput.files =
+                    dataTransfer.files;
+            }
 
+            const reader =
+                new FileReader();
 
-            publishBtn.textContent =
-                "Publish Photo";
+            reader.onload =
+                function (event) {
 
+                    if (previewImage) {
 
-            await loadPhotos();
+                        previewImage.src =
+                            event.target.result;
 
+                        previewImage.style.display =
+                            "block";
+                    }
 
-            resetForm();
+                    if (uploadContent) {
 
-        }
+                        uploadContent.style.display =
+                            "none";
+                    }
 
+                };
 
-        catch (error) {
-
-            console.error(
-                error
-            );
-
-
-            alert(
-                "Could not save photo.\n\n" +
-                error.message
-            );
-
-        }
-
-
-        finally {
-
-            publishBtn.disabled =
-                false;
-
-            publishBtn.textContent =
-                "Publish Photo";
+            reader.readAsDataURL(file);
 
         }
+    );
+}
 
-    }
-);
+
+// ============================================================
+// PUBLISH / UPDATE PHOTO
+// ============================================================
+
+if (publishBtn) {
+
+    publishBtn.addEventListener(
+        "click",
+        async function () {
+
+            try {
+
+                // --------------------------------------------
+                // VALIDATION
+                // --------------------------------------------
+
+                const title =
+                    photoTitle
+                        ? photoTitle.value.trim()
+                        : "";
+
+                const price =
+                    photoPrice
+                        ? photoPrice.value.trim()
+                        : "";
+
+                const description =
+                    photoDescription
+                        ? photoDescription.value.trim()
+                        : "";
+
+                const status =
+                    photoStatus
+                        ? photoStatus.value
+                        : "published";
 
 
-// ============================
+                if (!title) {
+
+                    alert(
+                        "Please enter a photo title."
+                    );
+
+                    return;
+                }
+
+
+                if (!price || Number(price) <= 0) {
+
+                    alert(
+                        "Please enter a valid price."
+                    );
+
+                    return;
+                }
+
+
+                // New photo requires image
+                if (!editingPhotoId && !selectedFile) {
+
+                    alert(
+                        "Please select a photo/image first."
+                    );
+
+                    return;
+                }
+
+
+                // --------------------------------------------
+                // BUTTON STATE
+                // --------------------------------------------
+
+                publishBtn.disabled = true;
+
+                publishBtn.textContent =
+                    editingPhotoId
+                        ? "Updating..."
+                        : "Uploading...";
+
+
+                // --------------------------------------------
+                // FORM DATA
+                // --------------------------------------------
+
+                const formData =
+                    new FormData();
+
+                formData.append(
+                    "title",
+                    title
+                );
+
+                formData.append(
+                    "price",
+                    price
+                );
+
+                formData.append(
+                    "description",
+                    description
+                );
+
+                formData.append(
+                    "status",
+                    status
+                );
+
+
+                // Add image only when selected
+                if (selectedFile) {
+
+                    formData.append(
+                        "image",
+                        selectedFile
+                    );
+                }
+
+
+                // --------------------------------------------
+                // CREATE
+                // --------------------------------------------
+
+                let response;
+
+
+                if (!editingPhotoId) {
+
+                    response =
+                        await fetch(
+                            `${API_BASE}/api/photos`,
+                            {
+                                method: "POST",
+                                body: formData
+                            }
+                        );
+
+                }
+
+
+                // --------------------------------------------
+                // UPDATE
+                // --------------------------------------------
+
+                else {
+
+                    response =
+                        await fetch(
+                            `${API_BASE}/api/photos/${editingPhotoId}`,
+                            {
+                                method: "PUT",
+                                body: formData
+                            }
+                        );
+
+                }
+
+
+                // --------------------------------------------
+                // READ RESPONSE SAFELY
+                // --------------------------------------------
+
+                const responseText =
+                    await response.text();
+
+                let data = {};
+
+                try {
+
+                    data =
+                        responseText
+                            ? JSON.parse(responseText)
+                            : {};
+
+                } catch (error) {
+
+                    console.error(
+                        "Invalid server response:",
+                        responseText
+                    );
+
+                    throw new Error(
+                        "Server returned an invalid response."
+                    );
+                }
+
+
+                // --------------------------------------------
+                // SERVER ERROR
+                // --------------------------------------------
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message ||
+                        `Server error (${response.status})`
+                    );
+                }
+
+
+                // --------------------------------------------
+                // SUCCESS
+                // --------------------------------------------
+
+                alert(
+                    editingPhotoId
+                        ? "Photo updated successfully! ✅"
+                        : "Photo published successfully! 🎉"
+                );
+
+
+                editingPhotoId = null;
+
+                publishBtn.textContent =
+                    "Publish Photo";
+
+
+                resetForm();
+
+
+                await loadPhotos();
+
+                await loadDashboardStats();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Publish error:",
+                    error
+                );
+
+
+                alert(
+                    "Could not save photo.\n\n" +
+                    error.message
+                );
+
+
+            } finally {
+
+                publishBtn.disabled = false;
+
+                publishBtn.textContent =
+                    "Publish Photo";
+
+            }
+
+        }
+    );
+}
+
+
+// ============================================================
 // LOAD PHOTOS
-// ============================
+// ============================================================
 
 async function loadPhotos() {
 
@@ -483,16 +514,15 @@ async function loadPhotos() {
 
         const response =
             await fetch(
-                "https://patient-creativity-production-c87f.up.railway.app/api/photos"
+                `${API_BASE}/api/photos`
             );
 
 
         if (!response.ok) {
 
             throw new Error(
-                "Could not load photos."
+                `Could not load photos (${response.status}).`
             );
-
         }
 
 
@@ -502,336 +532,376 @@ async function loadPhotos() {
 
         renderPhotos();
 
-    }
 
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
+            "Load photos error:",
             error
         );
 
+
+        if (photoGallery) {
+
+            photoGallery.innerHTML = `
+
+                <div class="empty-message">
+
+                    <div>⚠️</div>
+
+                    <h3>
+                        Backend not connected
+                    </h3>
+
+                    <p>
+                        Make sure server.js is running
+                        on port 5000.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+    }
+}
+
+
+// ============================================================
+// RENDER PHOTO GALLERY
+// ============================================================
+
+function renderPhotos() {
+
+    if (!photoGallery) {
+        return;
+    }
+
+
+    photoGallery.innerHTML = "";
+
+
+    if (photoCount) {
+
+        photoCount.textContent =
+            photos.length;
+
+    }
+
+
+    if (photos.length === 0) {
 
         photoGallery.innerHTML = `
 
             <div class="empty-message">
 
-                <div>
-                    ⚠️
-                </div>
+                <div>📷</div>
 
-                <h3>
-                    Backend not connected
-                </h3>
+                <h3>No photos yet</h3>
 
                 <p>
-                    Make sure server.js is running.
+                    Upload your first photo.
                 </p>
 
             </div>
 
         `;
 
+        return;
     }
+
+
+    photos.forEach(function (photo) {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "photo-card";
+
+
+        // --------------------------------------------
+        // IMAGE
+        // --------------------------------------------
+
+        const image =
+            document.createElement("img");
+
+        const imageData =
+            getImageData(photo);
+
+
+        if (imageData.preview) {
+
+            image.src =
+                imageData.preview.startsWith("http")
+                    ? imageData.preview
+                    : `${API_BASE}${imageData.preview}`;
+
+        }
+
+        image.alt =
+            photo.title || "Photo";
+
+
+        // --------------------------------------------
+        // INFO
+        // --------------------------------------------
+
+        const info =
+            document.createElement("div");
+
+        info.className =
+            "photo-info";
+
+
+        const title =
+            document.createElement("h3");
+
+        title.textContent =
+            photo.title;
+
+
+        const price =
+            document.createElement("div");
+
+        price.className =
+            "photo-price";
+
+        price.textContent =
+            `₹${photo.price}`;
+
+
+        const description =
+            document.createElement("p");
+
+        description.className =
+            "photo-description";
+
+        description.textContent =
+            photo.description ||
+            "No description";
+
+
+        // --------------------------------------------
+        // STATUS
+        // --------------------------------------------
+
+        const status =
+            document.createElement("span");
+
+        status.className =
+            "photo-status";
+
+        status.textContent =
+            photo.status || "published";
+
+
+        // --------------------------------------------
+        // ACTIONS
+        // --------------------------------------------
+
+        const actions =
+            document.createElement("div");
+
+        actions.className =
+            "photo-actions";
+
+
+        // EDIT BUTTON
+
+        const editButton =
+            document.createElement("button");
+
+        editButton.type =
+            "button";
+
+        editButton.textContent =
+            "✏️ Edit";
+
+        editButton.className =
+            "edit-btn";
+
+
+        editButton.addEventListener(
+            "click",
+            function () {
+
+                editPhoto(photo);
+
+            }
+        );
+
+
+        // DELETE BUTTON
+
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.type =
+            "button";
+
+        deleteButton.textContent =
+            "🗑️ Delete";
+
+        deleteButton.className =
+            "delete-btn";
+
+
+        deleteButton.addEventListener(
+            "click",
+            function () {
+
+                deletePhoto(photo.id);
+
+            }
+        );
+
+
+        // --------------------------------------------
+        // BUILD CARD
+        // --------------------------------------------
+
+        actions.appendChild(
+            editButton
+        );
+
+        actions.appendChild(
+            deleteButton
+        );
+
+
+        info.appendChild(title);
+
+        info.appendChild(price);
+
+        info.appendChild(description);
+
+        info.appendChild(status);
+
+        info.appendChild(actions);
+
+
+        card.appendChild(image);
+
+        card.appendChild(info);
+
+
+        photoGallery.appendChild(card);
+
+    });
 
 }
 
 
-// ============================
-// RENDER PHOTOS
-// ============================
+// ============================================================
+// EDIT PHOTO
+// ============================================================
 
-function renderPhotos() {
+function editPhoto(photo) {
 
-    photoGallery.innerHTML = "";
+    editingPhotoId =
+        photo.id;
 
 
-    photoCount.textContent =
-        photos.length;
+    if (photoTitle) {
+
+        photoTitle.value =
+            photo.title || "";
+
+    }
+
+
+    if (photoPrice) {
+
+        photoPrice.value =
+            photo.price || "";
+
+    }
+
+
+    if (photoStatus) {
+
+        photoStatus.value =
+            photo.status || "published";
+
+    }
+
+
+    if (photoDescription) {
+
+        photoDescription.value =
+            photo.description || "";
+
+    }
+
+
+    selectedFile = null;
+
+
+    if (photoInput) {
+
+        photoInput.value = "";
+
+    }
+
+
+    const imageData =
+        getImageData(photo);
 
 
     if (
-        photos.length === 0
+        previewImage &&
+        imageData.preview
     ) {
 
-        photoGallery.appendChild(
-            emptyMessage
-        );
+        previewImage.src =
+            imageData.preview.startsWith("http")
+                ? imageData.preview
+                : `${API_BASE}${imageData.preview}`;
 
-        return;
+        previewImage.style.display =
+            "block";
 
     }
 
 
-    photos.forEach(
-        function (photo) {
+    if (uploadContent) {
 
+        uploadContent.style.display =
+            "none";
 
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.className =
-                "photo-card";
-
-
-            const image =
-                document.createElement(
-                    "img"
-                );
-
-
-            image.src =
-                photo.image;
-
-
-            image.alt =
-                photo.title;
-
-
-            const info =
-                document.createElement(
-                    "div"
-                );
-
-
-            info.className =
-                "photo-info";
-
-
-            const title =
-                document.createElement(
-                    "h3"
-                );
-
-
-            title.textContent =
-                photo.title;
-
-
-            const price =
-                document.createElement(
-                    "div"
-                );
-
-
-            price.className =
-                "photo-price";
-
-
-            price.textContent =
-                `₹${photo.price}`;
-
-
-            const description =
-                document.createElement(
-                    "p"
-                );
-
-
-            description.className =
-                "photo-description";
-
-
-            description.textContent =
-                photo.description ||
-                "No description";
-
-
-            const actions =
-                document.createElement(
-                    "div"
-                );
-
-
-            actions.className =
-                "photo-actions";
-
-
-            const editButton =
-                document.createElement(
-                    "button"
-                );
-
-
-            editButton.className =
-                "edit-btn";
-
-
-            editButton.textContent =
-                "Edit";
-
-
-            editButton.addEventListener(
-                "click",
-                function () {
-
-                    editPhoto(
-                        photo.id
-                    );
-
-                }
-            );
-
-
-            const deleteButton =
-                document.createElement(
-                    "button"
-                );
-
-
-            deleteButton.className =
-                "delete-btn";
-
-
-            deleteButton.textContent =
-                "Delete";
-
-
-            deleteButton.addEventListener(
-                "click",
-                function () {
-
-                    deletePhoto(
-                        photo.id
-                    );
-
-                }
-            );
-
-
-            actions.appendChild(
-                editButton
-            );
-
-
-            actions.appendChild(
-                deleteButton
-            );
-
-
-            info.appendChild(
-                title
-            );
-
-
-            info.appendChild(
-                price
-            );
-
-
-            info.appendChild(
-                description
-            );
-
-
-            info.appendChild(
-                actions
-            );
-
-
-            card.appendChild(
-                image
-            );
-
-
-            card.appendChild(
-                info
-            );
-
-
-            photoGallery.appendChild(
-                card
-            );
-
-        }
-    );
-
-}
-
-
-// ============================
-// EDIT PHOTO
-// ============================
-
-function editPhoto(id) {
-
-    const photo =
-        photos.find(
-            item =>
-                item.id === id
-        );
-
-
-    if (!photo) {
-        return;
     }
 
 
-    editingPhotoId =
-        id;
+    if (publishBtn) {
+
+        publishBtn.textContent =
+            "Update Photo";
+
+    }
 
 
-    photoTitle.value =
-        photo.title;
+    // Scroll to form
 
-
-    photoPrice.value =
-        photo.price;
-
-
-    photoDescription.value =
-        photo.description;
-
-
-    photoStatus.value =
-        photo.status;
-
-
-    selectedImageData =
-        photo.image;
-
-
-    previewImage.src =
-        photo.image;
-
-
-    previewImage.style.display =
-        "block";
-
-
-    uploadContent.style.display =
-        "none";
-
-
-    changeImageBtn.style.display =
-        "block";
-
-
-    publishBtn.textContent =
-        "Update Photo";
-
-
-    document
-        .getElementById("upload")
-        .scrollIntoView({
-            behavior: "smooth"
-        });
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 
 }
 
 
-// ============================
+// ============================================================
 // DELETE PHOTO
-// ============================
+// ============================================================
 
-async function deletePhoto(id) {
+async function deletePhoto(photoId) {
 
     const confirmed =
         confirm(
-            "Delete this photo?"
+            "Are you sure you want to delete this photo?"
         );
 
 
@@ -844,41 +914,66 @@ async function deletePhoto(id) {
 
         const response =
             await fetch(
-                `https://patient-creativity-production-c87f.up.railway.app/api/photos/${id}`,
+                `${API_BASE}/api/photos/${photoId}`,
                 {
                     method: "DELETE"
                 }
             );
 
 
-        const data =
-            await response.json();
+        const responseText =
+            await response.text();
+
+
+        let data = {};
+
+        try {
+
+            data =
+                responseText
+                    ? JSON.parse(responseText)
+                    : {};
+
+        } catch (error) {
+
+            throw new Error(
+                "Invalid server response."
+            );
+
+        }
 
 
         if (!response.ok) {
 
             throw new Error(
                 data.message ||
-                "Delete failed."
+                `Delete failed (${response.status})`
             );
 
         }
 
 
+        alert(
+            "Photo deleted successfully. 🗑️"
+        );
+
+
         await loadPhotos();
 
+        await loadDashboardStats();
 
-    }
 
-    catch (error) {
+    } catch (error) {
 
         console.error(
+            "Delete error:",
             error
         );
 
 
         alert(
-            "Could not delete photo."
+            "Could not delete photo.\n\n" +
+            error.message
         );
 
     }
@@ -886,122 +981,141 @@ async function deletePhoto(id) {
 }
 
 
-// ============================
-// RESET
-// ============================
+// ============================================================
+// RESET FORM
+// ============================================================
 
 function resetForm() {
 
-    photoInput.value =
-        "";
+    editingPhotoId = null;
+
+    selectedFile = null;
 
 
-    photoTitle.value =
-        "";
+    if (photoInput) {
+
+        photoInput.value = "";
+
+    }
 
 
-    photoPrice.value =
-        "";
+    if (photoTitle) {
+
+        photoTitle.value = "";
+
+    }
 
 
-    photoDescription.value =
-        "";
+    if (photoPrice) {
+
+        photoPrice.value = "";
+
+    }
 
 
-    photoStatus.value =
-        "published";
+    if (photoDescription) {
+
+        photoDescription.value = "";
+
+    }
 
 
-    selectedImageData =
-        null;
+    if (photoStatus) {
+
+        photoStatus.value =
+            "published";
+
+    }
 
 
-    editingPhotoId =
-        null;
+    if (previewImage) {
+
+        previewImage.src = "";
+
+        previewImage.style.display =
+            "none";
+
+    }
 
 
-    previewImage.src =
-        "";
+    if (uploadContent) {
+
+        uploadContent.style.display =
+            "block";
+
+    }
 
 
-    previewImage.style.display =
-        "none";
+    if (publishBtn) {
 
+        publishBtn.textContent =
+            "Publish Photo";
 
-    uploadContent.style.display =
-        "flex";
-
-
-    changeImageBtn.style.display =
-        "none";
-
-
-    publishBtn.textContent =
-        "Publish Photo";
+    }
 
 }
 
 
-// ============================
+// ============================================================
 // RESET BUTTON
-// ============================
+// ============================================================
 
-resetBtn.addEventListener(
-    "click",
-    function () {
+if (resetBtn) {
 
-        resetForm();
+    resetBtn.addEventListener(
+        "click",
+        function () {
 
-    }
-);
+            resetForm();
+
+        }
+    );
+
+}
 
 
-// ============================
-// INITIAL LOAD
-// ============================
-
-loadPhotos();
-// =========================
+// ============================================================
 // LOAD PURCHASES
-// =========================
+// ============================================================
 
 async function loadPurchases() {
 
     try {
 
-        const response = await fetch(
-            "https://patient-creativity-production-c87f.up.railway.app/api/purchases"
-        );
+        const response =
+            await fetch(
+                `${API_BASE}/api/purchases`
+            );
 
 
         if (!response.ok) {
 
             throw new Error(
-                "Could not load purchases."
+                `Could not load purchases (${response.status}).`
             );
 
         }
 
 
-        const purchases = await response.json();
+        const purchases =
+            await response.json();
 
 
-        const tableBody =
-            document.getElementById(
-                "purchaseTableBody"
-            );
-
-
-        if (!tableBody) {
-
+        if (!purchaseTableBody) {
             return;
-
         }
 
 
-        if (purchases.length === 0) {
+        purchaseTableBody.innerHTML =
+            "";
 
-            tableBody.innerHTML = `
+
+        if (
+            !purchases ||
+            purchases.length === 0
+        ) {
+
+            purchaseTableBody.innerHTML = `
 
                 <tr>
 
@@ -1016,81 +1130,91 @@ async function loadPurchases() {
             `;
 
             return;
-
         }
 
 
-        tableBody.innerHTML = "";
+        purchases.forEach(
+            function (purchase) {
+
+                const row =
+                    document.createElement("tr");
 
 
-        purchases.forEach(purchase => {
+                const photo =
+                    photos.find(
+                        function (item) {
 
-            const row =
-                document.createElement("tr");
+                            return (
+                                Number(item.id) ===
+                                Number(purchase.photo_id)
+                            );
 
-
-            const photo =
-                typeof photos !== "undefined"
-
-                    ? photos.find(
-                        item =>
-                            Number(item.id) ===
-                            Number(purchase.photoId)
-                    )
-
-                    : null;
+                        }
+                    );
 
 
-            const photoTitle =
-                photo
-                    ? photo.title
-                    : `Photo #${purchase.photoId}`;
+                const photoTitle =
+                    photo
+                        ? photo.title
+                        : (
+                            purchase.photo_title ||
+                            `Photo #${purchase.photo_id}`
+                        );
 
 
-            const date =
-                new Date(
-                    purchase.purchasedAt
-                ).toLocaleString();
+                const amount =
+                    Number(
+                        purchase.amount || 0
+                    ).toFixed(2);
 
 
-            row.innerHTML = `
-
-                <td>
-                    ${photoTitle}
-                </td>
-
-                <td>
-                    ₹${purchase.amount}
-                </td>
-
-                <td>
-                    ${purchase.paymentId}
-                </td>
-
-                <td>
-                    ${date}
-                </td>
-
-                <td>
-
-                    <span class="purchase-status">
-                        Paid ✓
-                    </span>
-
-                </td>
-
-            `;
+                const date =
+                    purchase.purchased_at
+                        ? new Date(
+                            purchase.purchased_at
+                        ).toLocaleString()
+                        : "-";
 
 
-            tableBody.appendChild(row);
+                row.innerHTML = `
 
-        });
+                    <td>
+                        ${photoTitle}
+                    </td>
+
+                    <td>
+                        ₹${amount}
+                    </td>
+
+                    <td>
+                        ${purchase.payment_id || "-"}
+                    </td>
+
+                    <td>
+                        ${date}
+                    </td>
+
+                    <td>
+                        <span class="purchase-status">
+                            Paid ✓
+                        </span>
+                    </td>
+
+                `;
+
+
+                purchaseTableBody.appendChild(
+                    row
+                );
+
+            }
+        );
 
 
     } catch (error) {
 
         console.error(
-            "Purchase loading error:",
+            "Purchases error:",
             error
         );
 
@@ -1099,84 +1223,58 @@ async function loadPurchases() {
 }
 
 
-// =========================
-// LOAD ON PAGE OPEN
-// =========================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        loadPurchases();
-
-    }
-);
-// =========================
-// LOAD DASHBOARD STATS
-// =========================
+// ============================================================
+// DASHBOARD STATISTICS
+// ============================================================
 
 async function loadDashboardStats() {
 
     try {
 
-        const response = await fetch(
-            "https://patient-creativity-production-c87f.up.railway.app/api/stats"
-        );
+        const response =
+            await fetch(
+                `${API_BASE}/api/stats`
+            );
+
 
         if (!response.ok) {
 
             throw new Error(
-                "Could not load dashboard statistics."
+                `Could not load statistics (${response.status}).`
             );
 
         }
 
-        const stats = await response.json();
 
+        const stats =
+            await response.json();
 
-        // Total Photos
-
-        const totalPhotos =
-            document.getElementById(
-                "totalPhotos"
-            );
 
         if (totalPhotos) {
 
             totalPhotos.textContent =
-                stats.totalPhotos;
+                stats.totalPhotos ?? 0;
 
         }
 
-
-        // Total Purchases
-
-        const totalPurchases =
-            document.getElementById(
-                "totalPurchases"
-            );
 
         if (totalPurchases) {
 
             totalPurchases.textContent =
-                stats.totalPurchases;
+                stats.totalPurchases ?? 0;
 
         }
 
-
-        // Total Revenue
-
-        const totalRevenue =
-            document.getElementById(
-                "totalRevenue"
-            );
 
         if (totalRevenue) {
 
             totalRevenue.textContent =
-                `₹${stats.totalRevenue}`;
+                `₹${Number(
+                    stats.totalRevenue || 0
+                ).toFixed(2)}`;
 
         }
+
 
     } catch (error) {
 
@@ -1188,3 +1286,21 @@ async function loadDashboardStats() {
     }
 
 }
+
+
+// ============================================================
+// INITIAL LOAD
+// ============================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
+
+        await loadPhotos();
+
+        await loadPurchases();
+
+        await loadDashboardStats();
+
+    }
+);
