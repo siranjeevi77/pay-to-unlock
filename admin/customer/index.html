@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -11,7 +12,7 @@
 
     <title>Pay to Unlock</title>
 
-    <!-- Razorpay -->
+    <!-- Razorpay Checkout -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <style>
@@ -22,15 +23,27 @@
 
         body {
             margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(
-                135deg,
-                #eef2ff,
-                #f8fafc
-            );
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef2ff,
+                    #f8fafc
+                );
+
             min-height: 100vh;
+
             padding: 40px 20px;
         }
+
+        /* =========================================
+           HEADER
+        ========================================= */
 
         .page-header {
             text-align: center;
@@ -39,46 +52,84 @@
 
         .page-header h1 {
             margin: 0 0 10px;
+
             font-size: 36px;
+
             color: #111827;
         }
 
         .page-header p {
             margin: 0;
+
             color: #64748b;
+
             font-size: 16px;
         }
 
+        /* =========================================
+           PHOTO LIST
+        ========================================= */
+
         #photoList {
             width: 100%;
+
             max-width: 750px;
+
             margin: auto;
+
             display: flex;
+
             flex-direction: column;
+
             gap: 30px;
         }
 
+        /* =========================================
+           PHOTO CARD
+        ========================================= */
+
         .photo-card {
             background: white;
+
             border-radius: 22px;
+
             overflow: hidden;
+
             box-shadow:
-                0 15px 40px rgba(0, 0, 0, 0.08);
+                0 15px 40px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
         }
+
+        /* =========================================
+           PHOTO CONTAINER
+        ========================================= */
 
         .photo-container {
             position: relative;
+
             width: 100%;
+
             height: 450px;
+
             background: #f1f5f9;
+
             overflow: hidden;
         }
 
         .photo-image {
             width: 100%;
+
             height: 100%;
+
             object-fit: contain;
+
             display: block;
+
             background: #f1f5f9;
 
             transition:
@@ -92,38 +143,64 @@
 
         .photo-image.unlocked {
             filter: none;
+
             transform: none;
         }
 
+        /* =========================================
+           LOCK OVERLAY
+        ========================================= */
+
         .lock-overlay {
             position: absolute;
+
             inset: 0;
 
             display: flex;
+
             align-items: center;
+
             justify-content: center;
+
             flex-direction: column;
 
-            background: rgba(0, 0, 0, 0.30);
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.30
+                );
 
             color: white;
+
             text-align: center;
+
+            transition:
+                opacity 0.3s ease;
         }
 
         .lock-icon {
             font-size: 55px;
+
             margin-bottom: 10px;
         }
 
         .lock-overlay h2 {
             margin: 5px;
+
             font-size: 24px;
         }
 
         .lock-overlay p {
             margin: 5px;
+
             font-size: 14px;
         }
+
+        /* =========================================
+           PHOTO INFORMATION
+        ========================================= */
 
         .photo-info {
             padding: 25px;
@@ -131,39 +208,61 @@
 
         .photo-title {
             margin: 0 0 8px;
+
             font-size: 24px;
+
             color: #111827;
         }
 
         .photo-description {
             margin: 0 0 20px;
+
             color: #64748b;
+
             line-height: 1.6;
         }
 
+        /* =========================================
+           BOTTOM SECTION
+        ========================================= */
+
         .photo-bottom {
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
+
             gap: 15px;
         }
 
         .photo-price {
             font-size: 26px;
+
             font-weight: bold;
+
             color: #4f46e5;
         }
 
+        /* =========================================
+           UNLOCK BUTTON
+        ========================================= */
+
         .unlock-button {
             border: none;
+
             background: #4f46e5;
+
             color: white;
 
-            padding: 14px 22px;
+            padding:
+                14px
+                22px;
 
             border-radius: 11px;
 
             font-size: 15px;
+
             font-weight: bold;
 
             cursor: pointer;
@@ -175,28 +274,49 @@
 
         .unlock-button:hover {
             background: #4338ca;
-            transform: translateY(-1px);
+
+            transform:
+                translateY(-1px);
         }
 
         .unlock-button:disabled {
             opacity: 0.7;
+
             cursor: not-allowed;
+
             transform: none;
         }
 
+        /* =========================================
+           EMPTY / ERROR MESSAGE
+        ========================================= */
+
         .empty-message {
             text-align: center;
+
             background: white;
+
             border-radius: 20px;
-            padding: 60px 20px;
+
+            padding:
+                60px
+                20px;
+
             color: #64748b;
 
             box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.05);
+                0 10px 30px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.05
+                );
         }
 
         .empty-message .icon {
             font-size: 50px;
+
             margin-bottom: 15px;
         }
 
@@ -204,10 +324,16 @@
             color: #334155;
         }
 
+        /* =========================================
+           MOBILE
+        ========================================= */
+
         @media (max-width: 600px) {
 
             body {
-                padding: 25px 12px;
+                padding:
+                    25px
+                    12px;
             }
 
             .page-header h1 {
@@ -220,6 +346,7 @@
 
             .photo-bottom {
                 flex-direction: column;
+
                 align-items: stretch;
             }
 
@@ -230,6 +357,7 @@
             .unlock-button {
                 width: 100%;
             }
+
         }
 
     </style>
@@ -238,6 +366,10 @@
 
 
 <body>
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
 
     <header class="page-header">
 
@@ -251,6 +383,10 @@
 
     </header>
 
+
+    <!-- =========================================
+         PHOTO LIST
+    ========================================== -->
 
     <div id="photoList">
 
@@ -284,12 +420,15 @@
 
 
         // ==================================================
-        // IMAGE DATA
+        // GET IMAGE DATA
         // ==================================================
 
         function getImageData(photo) {
 
-            if (!photo || !photo.image) {
+            if (
+                !photo ||
+                !photo.image
+            ) {
 
                 return {
                     preview: "",
@@ -301,7 +440,9 @@
             try {
 
                 const parsed =
-                    JSON.parse(photo.image);
+                    JSON.parse(
+                        photo.image
+                    );
 
                 if (
                     parsed &&
@@ -321,15 +462,20 @@
             }
 
             return {
-                preview: photo.image,
-                original: photo.image
+
+                preview:
+                    photo.image,
+
+                original:
+                    photo.image
+
             };
 
         }
 
 
         // ==================================================
-        // BUILD IMAGE URL
+        // BUILD PREVIEW URL
         // ==================================================
 
         function getPreviewUrl(photo) {
@@ -337,12 +483,18 @@
             const imageData =
                 getImageData(photo);
 
-            if (!imageData.preview) {
+            if (
+                !imageData.preview
+            ) {
+
                 return "";
+
             }
 
             if (
-                imageData.preview.startsWith("http")
+                imageData.preview.startsWith(
+                    "http"
+                )
             ) {
 
                 return imageData.preview;
@@ -368,7 +520,6 @@
                     "photoList"
                 );
 
-
             try {
 
                 const response =
@@ -377,7 +528,9 @@
                     );
 
 
-                if (!response.ok) {
+                if (
+                    !response.ok
+                ) {
 
                     throw new Error(
                         `Server error: ${response.status}`
@@ -390,6 +543,8 @@
                     await response.json();
 
 
+                // Only published photos
+
                 const publishedPhotos =
                     photos.filter(
                         photo =>
@@ -397,6 +552,8 @@
                             "published"
                     );
 
+
+                // No photos
 
                 if (
                     publishedPhotos.length === 0
@@ -427,8 +584,12 @@
                 }
 
 
+                // Clear loading message
+
                 photoList.innerHTML = "";
 
+
+                // Create cards
 
                 publishedPhotos.forEach(
                     function(photo) {
@@ -485,6 +646,10 @@
             container
         ) {
 
+            // ==========================================
+            // CARD
+            // ==========================================
+
             const card =
                 document.createElement(
                     "div"
@@ -494,7 +659,9 @@
                 "photo-card";
 
 
+            // ==========================================
             // IMAGE CONTAINER
+            // ==========================================
 
             const imageContainer =
                 document.createElement(
@@ -505,7 +672,9 @@
                 "photo-container";
 
 
+            // ==========================================
             // IMAGE
+            // ==========================================
 
             const image =
                 document.createElement(
@@ -515,16 +684,17 @@
             image.className =
                 "photo-image locked";
 
-
             image.src =
                 getPreviewUrl(photo);
 
-
             image.alt =
-                photo.title || "Premium photo";
+                photo.title ||
+                "Premium photo";
 
 
+            // ==========================================
             // LOCK OVERLAY
+            // ==========================================
 
             const overlay =
                 document.createElement(
@@ -561,7 +731,9 @@
             );
 
 
+            // ==========================================
             // PHOTO INFO
+            // ==========================================
 
             const info =
                 document.createElement(
@@ -572,7 +744,9 @@
                 "photo-info";
 
 
+            // ==========================================
             // TITLE
+            // ==========================================
 
             const title =
                 document.createElement(
@@ -586,7 +760,9 @@
                 photo.title;
 
 
+            // ==========================================
             // DESCRIPTION
+            // ==========================================
 
             const description =
                 document.createElement(
@@ -601,7 +777,9 @@
                 "Premium photo";
 
 
+            // ==========================================
             // BOTTOM
+            // ==========================================
 
             const bottom =
                 document.createElement(
@@ -612,7 +790,9 @@
                 "photo-bottom";
 
 
+            // ==========================================
             // PRICE
+            // ==========================================
 
             const price =
                 document.createElement(
@@ -626,7 +806,9 @@
                 `₹${photo.price}`;
 
 
+            // ==========================================
             // BUTTON
+            // ==========================================
 
             const button =
                 document.createElement(
@@ -639,6 +821,10 @@
             button.textContent =
                 `🔓 Unlock for ₹${photo.price}`;
 
+
+            // ==========================================
+            // BUTTON EVENT
+            // ==========================================
 
             button.addEventListener(
                 "click",
@@ -655,6 +841,10 @@
             );
 
 
+            // ==========================================
+            // BUILD BOTTOM
+            // ==========================================
+
             bottom.appendChild(
                 price
             );
@@ -663,6 +853,10 @@
                 button
             );
 
+
+            // ==========================================
+            // BUILD INFO
+            // ==========================================
 
             info.appendChild(
                 title
@@ -676,6 +870,10 @@
                 bottom
             );
 
+
+            // ==========================================
+            // BUILD CARD
+            // ==========================================
 
             card.appendChild(
                 imageContainer
@@ -706,6 +904,10 @@
 
             try {
 
+                // ==========================================
+                // DISABLE BUTTON
+                // ==========================================
+
                 button.disabled =
                     true;
 
@@ -713,33 +915,43 @@
                     "Creating payment...";
 
 
-                // ==================================================
+                // ==========================================
                 // CREATE RAZORPAY ORDER
-                // ==================================================
+                // ==========================================
 
                 const orderResponse =
                     await fetch(
                         `${API_BASE}/api/create-order`,
                         {
-                            method: "POST",
+
+                            method:
+                                "POST",
 
                             headers: {
+
                                 "Content-Type":
                                     "application/json"
+
                             },
 
                             body:
                                 JSON.stringify({
+
                                     photoId:
                                         photo.id
+
                                 })
+
                         }
                     );
 
 
+                // ==========================================
+                // READ RESPONSE
+                // ==========================================
+
                 const orderText =
                     await orderResponse.text();
-
 
                 let orderData = {};
 
@@ -762,7 +974,9 @@
                 }
 
 
-                if (!orderResponse.ok) {
+                if (
+                    !orderResponse.ok
+                ) {
 
                     throw new Error(
                         orderData.message ||
@@ -778,9 +992,27 @@
                 );
 
 
-                // ==================================================
-                // RAZORPAY OPTIONS
-                // ==================================================
+                // ==========================================
+                // CHECK REQUIRED ORDER DATA
+                // ==========================================
+
+                if (
+                    !orderData.keyId ||
+                    !orderData.orderId ||
+                    !orderData.amount ||
+                    !orderData.currency
+                ) {
+
+                    throw new Error(
+                        "Payment server returned incomplete order information."
+                    );
+
+                }
+
+
+                // ==========================================
+                // RAZORPAY CHECKOUT OPTIONS
+                // ==========================================
 
                 const options = {
 
@@ -803,9 +1035,9 @@
                         orderData.orderId,
 
 
-                    // ==================================================
-                    // PAYMENT SUCCESS
-                    // ==================================================
+                    // ======================================
+                    // SUCCESS HANDLER
+                    // ======================================
 
                     handler:
                         async function(
@@ -818,20 +1050,23 @@
                                     "Verifying payment...";
 
 
-                                // ==================================================
+                                // ======================================
                                 // VERIFY PAYMENT
-                                // ==================================================
+                                // ======================================
 
                                 const verifyResponse =
                                     await fetch(
                                         `${API_BASE}/api/verify-payment`,
                                         {
+
                                             method:
                                                 "POST",
 
                                             headers: {
+
                                                 "Content-Type":
                                                     "application/json"
+
                                             },
 
                                             body:
@@ -849,20 +1084,26 @@
                                                         response
                                                             .razorpay_signature,
 
-                                                    photoId:
+                                                    // Backend uses photo_id
+
+                                                    photo_id:
                                                         photo.id
 
                                                 })
+
                                         }
                                     );
 
 
+                                // ======================================
+                                // READ VERIFICATION RESPONSE
+                                // ======================================
+
                                 const verifyText =
                                     await verifyResponse.text();
 
+                                let verifyData = {};
 
-                                let verifyData =
-                                    {};
 
                                 try {
 
@@ -894,21 +1135,27 @@
                                 }
 
 
-                                // ==================================================
+                                // ======================================
                                 // PAYMENT VERIFIED
-                                // ==================================================
+                                // ======================================
+
+                                console.log(
+                                    "Payment verified:",
+                                    verifyData
+                                );
+
+
+                                button.textContent =
+                                    "Unlocking...";
+
+
+                                // ======================================
+                                // GET ORIGINAL IMAGE
+                                // ======================================
 
                                 const paymentId =
                                     response
                                         .razorpay_payment_id;
-
-
-                                // ==================================================
-                                // FETCH ORIGINAL IMAGE
-                                // ==================================================
-
-                                button.textContent =
-                                    "Unlocking...";
 
 
                                 const originalResponse =
@@ -923,12 +1170,38 @@
                                     !originalResponse.ok
                                 ) {
 
+                                    const errorText =
+                                        await originalResponse.text();
+
+                                    let errorData = {};
+
+                                    try {
+
+                                        errorData =
+                                            errorText
+                                                ? JSON.parse(
+                                                    errorText
+                                                )
+                                                : {};
+
+                                    } catch {
+
+                                        errorData = {};
+
+                                    }
+
+
                                     throw new Error(
+                                        errorData.message ||
                                         "Payment verified, but original photo could not be accessed."
                                     );
 
                                 }
 
+
+                                // ======================================
+                                // CONVERT ORIGINAL TO BLOB
+                                // ======================================
 
                                 const originalBlob =
                                     await originalResponse.blob();
@@ -940,9 +1213,9 @@
                                     );
 
 
-                                // ==================================================
+                                // ======================================
                                 // SHOW ORIGINAL
-                                // ==================================================
+                                // ======================================
 
                                 image.src =
                                     originalUrl;
@@ -964,6 +1237,7 @@
 
                                 button.textContent =
                                     "✓ Unlocked";
+
 
                                 button.disabled =
                                     true;
@@ -1000,9 +1274,9 @@
                         },
 
 
-                    // ==================================================
-                    // CHECKOUT CLOSED
-                    // ==================================================
+                    // ======================================
+                    // CHECKOUT DISMISSED
+                    // ======================================
 
                     modal: {
 
@@ -1022,9 +1296,9 @@
                 };
 
 
-                // ==================================================
+                // ==========================================
                 // OPEN RAZORPAY
-                // ==================================================
+                // ==========================================
 
                 const razorpay =
                     new Razorpay(
@@ -1062,7 +1336,7 @@
 
 
         // ==================================================
-        // START
+        // START APP
         // ==================================================
 
         loadPhotos();
