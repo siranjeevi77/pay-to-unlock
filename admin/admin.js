@@ -3,7 +3,7 @@
 // ============================================================
 
 // Local Node.js backend
-const API_BASE = "http://localhost:5000";
+const API_BASE = window.location.origin;
 
 // ============================================================
 // DOM ELEMENTS
